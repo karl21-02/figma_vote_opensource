@@ -1,5 +1,5 @@
 {
-  "name": "Figma Vote",
+  "name": "FiVot",
   "id": "figma-vote-plugin",
   "api": "1.0.0",
   "main": "dist/code.js",
@@ -9,6 +9,6 @@
   "enableProposedApi": false,
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["https://*.workers.dev"]
+    "allowedDomains": ["https://figma-vote.manuna530.workers.dev"]
   }
 }

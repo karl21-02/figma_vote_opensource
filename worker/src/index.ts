@@ -1,9 +1,34 @@
 // ============================================================
-// Figma Vote - Cloudflare Worker API
+// FiVot (피봇) - Cloudflare Worker API
 // ============================================================
 
 export interface Env {
   VOTES: KVNamespace;
+}
+
+// --- Rate Limiting ---
+
+const RATE_LIMIT_WINDOW = 60; // seconds
+const RATE_LIMIT_MAX = 30;    // max requests per window per IP
+
+async function checkRateLimit(kv: KVNamespace, ip: string): Promise<boolean> {
+  const key = `ratelimit:${ip}`;
+  const data = await kv.get(key, 'json') as { count: number } | null;
+  const current = data ? data.count : 0;
+
+  if (current >= RATE_LIMIT_MAX) return false;
+
+  await kv.put(key, JSON.stringify({ count: current + 1 }), {
+    expirationTtl: RATE_LIMIT_WINDOW,
+  });
+  return true;
+}
+
+function rateLimited(): Response {
+  return cors(new Response(JSON.stringify({ error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' }), {
+    status: 429,
+    headers: { 'Content-Type': 'application/json', 'Retry-After': String(RATE_LIMIT_WINDOW) },
+  }));
 }
 
 interface VoteOption {
@@ -95,6 +120,13 @@ export default {
     // CORS preflight
     if (method === 'OPTIONS') {
       return cors(new Response(null, { status: 204 }));
+    }
+
+    // Rate limit (skip for GET requests to vote pages)
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    if (method === 'POST' || method === 'PATCH' || method === 'DELETE') {
+      const allowed = await checkRateLimit(env.VOTES, ip);
+      if (!allowed) return rateLimited();
     }
 
     // --- API Routes ---
@@ -216,7 +248,7 @@ export default {
 
     // Home
     if (path === '/') {
-      return new Response('Figma Vote API is running.', {
+      return new Response('FiVot API is running.', {
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
       });
     }
@@ -257,7 +289,7 @@ function renderVotePage(session: any, origin: string): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${escapeHtml(session.title)} - Figma Vote</title>
+<title>${escapeHtml(session.title)} - FiVot</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f7f7f8;color:#333;min-height:100vh;display:flex;justify-content:center;padding:20px}
@@ -292,7 +324,7 @@ h1{font-size:20px;font-weight:700;margin-bottom:4px}
 </head>
 <body>
 <div class="container">
-  <div class="logo">FIGMA VOTE</div>
+  <div class="logo">FIVOT</div>
   <div class="card">
     <h1>${escapeHtml(session.title)}</h1>
     ${session.description ? `<div class="desc">${escapeHtml(session.description)}</div>` : ''}
@@ -308,7 +340,7 @@ h1{font-size:20px;font-weight:700;margin-bottom:4px}
     </div>` : ''}
     <div class="total">총 ${session.totalVotes}표</div>
   </div>
-  <div class="footer">Powered by Figma Vote</div>
+  <div class="footer">Powered by FiVot</div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -317,7 +349,7 @@ const API = '${origin}/api/sessions/' + SESSION_ID;
 const CLOSED = ${session.status === 'closed'};
 
 (function() {
-  const saved = localStorage.getItem('figma-vote-name');
+  const saved = localStorage.getItem('fivot-name');
   if (saved) {
     const input = document.getElementById('voter-name');
     if (input) input.value = saved;
@@ -336,7 +368,7 @@ function vote(optionId) {
   var nameInput = document.getElementById('voter-name');
   var name = nameInput ? nameInput.value.trim() : '';
   if (!name) { showToast('이름을 입력해주세요.'); nameInput && nameInput.focus(); return; }
-  localStorage.setItem('figma-vote-name', name);
+  localStorage.setItem('fivot-name', name);
   var voterId = 'web_' + name.replace(/\\s/g, '_');
 
   fetch(API + '/vote', {

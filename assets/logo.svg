@@ -61,5 +61,5 @@
   </g>
 
   <!-- Text "VOTE" at bottom of box -->
-  <text x="256" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="42" fill="#6C5CE7" letter-spacing="6">VOTE</text>
+  <text x="256" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="42" fill="#6C5CE7" letter-spacing="4">FiVot</text>
 </svg>

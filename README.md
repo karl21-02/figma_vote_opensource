@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="Figma Vote" width="160" />
+  <img src="assets/logo.svg" alt="FiVot" width="160" />
 </p>
 
-<h1 align="center">Figma Vote</h1>
+<h1 align="center">FiVot (피봇)</h1>
 
 <p align="center">
   <strong>Figma 안에서 바로 투표하세요.</strong><br/>
@@ -18,7 +18,7 @@
 ---
 
 <p align="center">
-  <img src="assets/demo.gif" alt="Figma Vote Demo" width="720" />
+  <img src="assets/demo.gif" alt="FiVot Demo" width="720" />
 </p>
 
 ---
@@ -36,13 +36,13 @@
 ## How it works
 
 ```
-Figma Plugin ──── create vote ────▶ Cloudflare Worker (KV)
+FiVot Plugin ──── create vote ────▶ Cloudflare Worker (KV)
                                           │
-Team member ◀── share link ───────────────┘
+Team member  ◀── share link ──────────────┘
                                           │
-Browser     ──── cast vote ───────▶ Cloudflare Worker (KV)
+Browser      ──── cast vote ──────▶ Cloudflare Worker (KV)
                                           │
-Figma Plugin ◀── refresh ────────────────┘
+FiVot Plugin ◀── refresh ────────────────┘
 ```
 
 1. 플러그인에서 투표를 만들면 Cloudflare Worker에 저장됩니다.
@@ -56,8 +56,8 @@ Figma Plugin ◀── refresh ────────────────�
 ### 1. 플러그인 설치
 
 ```bash
-git clone https://github.com/your-username/figma-vote.git
-cd figma-vote
+git clone https://github.com/karl21-02/figma_vote_opensource.git
+cd figma_vote_opensource
 npm install
 npm run build
 ```
@@ -94,7 +94,7 @@ npm install
 npx wrangler deploy
 ```
 
-배포 후 출력되는 URL(예: `https://figma-vote.xxx.workers.dev`)을 플러그인 설정(⚙️)에 입력하면 완료!
+배포 후 출력되는 URL(예: `https://fivot.xxx.workers.dev`)을 플러그인 설정(⚙️)에 입력하면 완료!
 
 ### 3. 사용하기
 
@@ -107,7 +107,7 @@ npx wrangler deploy
 ## Project Structure
 
 ```
-figma-vote/
+figma_vote_opensource/
 ├── manifest.json          # Figma plugin manifest
 ├── package.json
 ├── scripts/

@@ -1,5 +1,5 @@
 // ============================================================
-// Figma Vote Plugin - UI Code
+// FiVot Plugin - UI Code
 // ============================================================
 
 // --- Types ---
@@ -191,7 +191,7 @@ function renderHomeView() {
 
   app.innerHTML = `
     <div class="header">
-      <div class="header-title">📮 Figma Vote</div>
+      <div class="header-title">📮 FiVot</div>
       <div class="header-actions">
         <button class="btn btn-ghost btn-icon" id="btn-settings" title="설정">⚙️</button>
         <button class="btn btn-primary btn-sm" id="btn-create">+ 새 투표</button>

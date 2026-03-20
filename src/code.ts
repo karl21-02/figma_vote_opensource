@@ -1,9 +1,9 @@
 // ============================================================
-// Figma Vote Plugin - Main Code (runs in Figma sandbox)
+// FiVot Plugin - Main Code (runs in Figma sandbox)
 // ============================================================
 
 // Worker API base URL
-const DEFAULT_API_BASE = ''; // 배포 후 설정에서 Worker URL 입력
+const DEFAULT_API_BASE = 'https://figma-vote.manuna530.workers.dev';
 const API_BASE = figma.root.getPluginData('api_base') || DEFAULT_API_BASE;
 
 interface VoteOption {
