@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6C5CE7"/>
+      <stop offset="100%" style="stop-color:#0D99FF"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFEAA7"/>
+      <stop offset="100%" style="stop-color:#FDCB6E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bg)"/>
+
+  <!-- Ballot box body -->
+  <rect x="136" y="240" width="240" height="180" rx="20" fill="#FFFFFF" opacity="0.95"/>
+  <rect x="136" y="240" width="240" height="40" rx="20" fill="#DFE6E9"/>
+  <rect x="136" y="260" width="240" height="20" fill="#DFE6E9"/>
+  <!-- Slot -->
+  <rect x="216" y="250" width="80" height="12" rx="6" fill="#636E72"/>
+
+  <!-- Character: cute voting mascot peeking from behind the box -->
+  <!-- Body -->
+  <ellipse cx="256" cy="200" rx="72" ry="68" fill="url(#body)"/>
+  <!-- Face -->
+  <!-- Eyes -->
+  <ellipse cx="232" cy="190" rx="10" ry="12" fill="#2D3436"/>
+  <ellipse cx="280" cy="190" rx="10" ry="12" fill="#2D3436"/>
+  <!-- Eye shine -->
+  <circle cx="236" cy="185" r="4" fill="#FFFFFF"/>
+  <circle cx="284" cy="185" r="4" fill="#FFFFFF"/>
+  <!-- Mouth (happy) -->
+  <path d="M240 210 Q256 226 272 210" stroke="#2D3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Blush -->
+  <ellipse cx="220" cy="208" rx="10" ry="6" fill="#FAB1A0" opacity="0.6"/>
+  <ellipse cx="292" cy="208" rx="10" ry="6" fill="#FAB1A0" opacity="0.6"/>
+
+  <!-- Ballot paper in hand -->
+  <g transform="rotate(-15, 320, 180)">
+    <rect x="295" y="140" width="50" height="70" rx="4" fill="#FFFFFF" stroke="#DFE6E9" stroke-width="2"/>
+    <!-- Checkmark on ballot -->
+    <path d="M308 168 L316 178 L332 158" stroke="#00B894" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Lines on ballot -->
+    <line x1="305" y1="150" x2="335" y2="150" stroke="#DFE6E9" stroke-width="2"/>
+    <line x1="305" y1="188" x2="335" y2="188" stroke="#DFE6E9" stroke-width="2"/>
+  </g>
+
+  <!-- Hand holding ballot -->
+  <ellipse cx="300" cy="200" rx="16" ry="14" fill="#FFEAA7"/>
+
+  <!-- Left hand waving -->
+  <ellipse cx="195" cy="215" rx="14" ry="12" fill="#FFEAA7" transform="rotate(15, 195, 215)"/>
+
+  <!-- Stars / sparkles -->
+  <g fill="#FFFFFF" opacity="0.8">
+    <polygon points="370,120 374,130 384,130 376,136 379,146 370,140 361,146 364,136 356,130 366,130"/>
+    <polygon points="150,130 153,137 160,137 154,141 156,148 150,144 144,148 146,141 140,137 147,137" transform="scale(0.8) translate(25, 20)"/>
+    <circle cx="168" cy="148" r="4"/>
+    <circle cx="380" cy="160" r="3"/>
+  </g>
+
+  <!-- Text "VOTE" at bottom of box -->
+  <text x="256" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="42" fill="#6C5CE7" letter-spacing="6">VOTE</text>
+</svg>

@@ -12,7 +12,7 @@ const codeConfig = {
   entryPoints: [path.join(rootDir, 'src/code.ts')],
   bundle: true,
   outfile: path.join(rootDir, 'dist/code.js'),
-  target: 'es2020',
+  target: 'es2015',
   format: 'iife',
 };
 
@@ -21,7 +21,7 @@ const uiScriptConfig = {
   entryPoints: [path.join(rootDir, 'src/ui/main.ts')],
   bundle: true,
   write: false,
-  target: 'es2020',
+  target: 'es2015',
   format: 'iife',
 };
 

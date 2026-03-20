@@ -4,10 +4,11 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
+  "permissions": ["currentuser"],
   "capabilities": [],
   "enableProposedApi": false,
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": ["https://*.workers.dev"]
   }
 }

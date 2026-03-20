@@ -34,9 +34,10 @@ interface FrameInfo {
 
 // --- State ---
 
-let currentView: 'home' | 'create' | 'vote' = 'home';
+let currentView: 'home' | 'create' | 'vote' | 'settings' = 'home';
 let sessions: VoteSession[] = [];
 let currentSession: VoteSession | null = null;
+let apiBaseUrl: string = '';
 let createType: 'poll' | 'design' | 'reaction' = 'poll';
 let selectedFrames: FrameInfo[] = [];
 let pollOptions: string[] = ['', ''];
@@ -57,9 +58,10 @@ function postMessage(type: string, payload?: any) {
 }
 
 window.onmessage = (event) => {
+  if (!event.data || !event.data.pluginMessage) return;
   const msg = event.data.pluginMessage;
-  if (!msg) return;
 
+  try {
   switch (msg.type) {
     case 'sessions-list':
       sessions = msg.payload;
@@ -96,9 +98,23 @@ window.onmessage = (event) => {
       renderCreateView();
       break;
 
+    case 'api-base-value':
+      apiBaseUrl = msg.payload.url || '';
+      if (currentView === 'settings') render();
+      break;
+
+    case 'api-base-set':
+      apiBaseUrl = msg.payload.url || '';
+      showToast('API URL 설정 완료!');
+      if (currentView === 'settings') render();
+      break;
+
     case 'error':
       showToast(msg.payload);
       break;
+  }
+  } catch (err) {
+    console.error('UI error:', err);
   }
 };
 
@@ -134,6 +150,9 @@ function render() {
       break;
     case 'vote':
       renderVoteView();
+      break;
+    case 'settings':
+      renderSettingsView();
       break;
   }
 }
@@ -174,6 +193,7 @@ function renderHomeView() {
     <div class="header">
       <div class="header-title">📮 Figma Vote</div>
       <div class="header-actions">
+        <button class="btn btn-ghost btn-icon" id="btn-settings" title="설정">⚙️</button>
         <button class="btn btn-primary btn-sm" id="btn-create">+ 새 투표</button>
       </div>
     </div>
@@ -194,6 +214,7 @@ function renderHomeView() {
                 <span>${typeIcon(s.type)} ${s.options.length}개 항목</span>
                 <span>🗳️ ${s.totalVotes || 0}표</span>
                 <span>${formatDate(s.createdAt)}</span>
+                ${(s as any).shareUrl ? '<span>🔗 공유됨</span>' : ''}
               </div>
             </div>
           `
@@ -212,6 +233,12 @@ function renderHomeView() {
   `;
 
   // Bind events
+  document.getElementById('btn-settings')?.addEventListener('click', () => {
+    currentView = 'settings';
+    postMessage('get-api-base');
+    render();
+  });
+
   document.getElementById('btn-create')?.addEventListener('click', () => {
     currentView = 'create';
     createType = 'poll';
@@ -505,8 +532,16 @@ function renderVoteView() {
             ${isClosed ? '마감됨' : '진행중'}
           </span>
           <span>🗳️ ${totalVotes}표</span>
-          <span>${escapeHtml(s.createdBy.name)}</span>
+          <span>${escapeHtml(typeof s.createdBy === 'string' ? s.createdBy : (s.createdBy as any).name || '')}</span>
         </div>
+        ${(s as any).shareUrl ? `
+        <div class="share-link mt-8">
+          <div style="display:flex;gap:6px;align-items:center">
+            <input class="form-input" id="share-url" value="${(s as any).shareUrl}" readonly style="font-size:11px;flex:1" />
+            <button class="btn btn-primary btn-sm" id="btn-copy-link">복사</button>
+          </div>
+        </div>
+        ` : ''}
       </div>
 
       ${renderVoteContent(s)}
@@ -527,12 +562,18 @@ function renderVoteView() {
     postMessage('reopen-session', { sessionId: s.id });
   });
   document.getElementById('btn-delete')?.addEventListener('click', () => {
-    if (confirm('이 투표를 삭제하시겠습니까?')) {
-      postMessage('delete-session', { sessionId: s.id });
-    }
+    postMessage('delete-session', { sessionId: s.id });
   });
   document.getElementById('btn-refresh')?.addEventListener('click', () => {
     postMessage('get-session', { sessionId: s.id });
+  });
+  document.getElementById('btn-copy-link')?.addEventListener('click', () => {
+    const input = document.getElementById('share-url') as HTMLInputElement;
+    if (input) {
+      input.select();
+      document.execCommand('copy');
+      showToast('링크가 복사되었습니다!');
+    }
   });
 
   bindVoteEvents(s);
@@ -715,6 +756,65 @@ function escapeHtml(str: string): string {
   return div.innerHTML;
 }
 
+// --- Settings View ---
+
+function renderSettingsView() {
+  app.innerHTML = `
+    <div class="header">
+      <button class="back-btn" id="btn-back">← 목록</button>
+      <div class="header-title">⚙️ 설정</div>
+      <div style="width:70px"></div>
+    </div>
+    <div class="content">
+      <div class="form-group">
+        <label class="form-label">Worker API URL</label>
+        <p style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;">
+          Cloudflare Worker 배포 후 URL을 입력하면 웹 링크로 투표를 공유할 수 있습니다.
+        </p>
+        <div style="display:flex;gap:6px">
+          <input class="form-input" id="input-api-url"
+                 placeholder="https://figma-vote.xxx.workers.dev"
+                 value="${escapeHtml(apiBaseUrl)}" />
+          <button class="btn btn-primary btn-sm" id="btn-save-api">저장</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">상태</label>
+        <p style="font-size:12px;">
+          ${apiBaseUrl
+            ? '🟢 API 연결됨 - 투표 생성 시 공유 링크가 자동 생성됩니다.'
+            : '🔴 API 미연결 - 로컬 전용 모드 (같은 Figma 파일 내에서만 투표 가능)'}
+        </p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">데이터 관리</label>
+        <button class="btn btn-danger btn-sm mt-8" id="btn-reset">모든 투표 초기화</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btn-back')?.addEventListener('click', goHome);
+  document.getElementById('btn-save-api')?.addEventListener('click', () => {
+    const url = (document.getElementById('input-api-url') as HTMLInputElement).value.trim();
+    // Remove trailing slash
+    const cleanUrl = url.replace(/\/+$/, '');
+    postMessage('set-api-base', { url: cleanUrl });
+  });
+  document.getElementById('btn-reset')?.addEventListener('click', () => {
+    postMessage('reset-all');
+  });
+}
+
 // --- Init ---
 
+// Render immediately so UI is never blank
+render();
+// Then request data from plugin
 postMessage('get-sessions');
+postMessage('get-api-base');
